@@ -81,7 +81,7 @@ export default function DetailScreen() {
       </ImageBackground>
 
       {/* Informasi Utama */}
-      <Section title="📋 Informasi Umum">
+      <Section title="Informasi Umum">
         <Info label="Sutradara" value={detail.Director} />
         <Info label="Penulis" value={detail.Writer} />
         <Info label="Pemeran" value={detail.Actors} />
@@ -93,12 +93,12 @@ export default function DetailScreen() {
       </Section>
 
       {/* Sinopsis */}
-      <Section title="📖 Sinopsis">
+      <Section title="Sinopsis">
         <Text style={styles.plot}>{detail.Plot}</Text>
       </Section>
 
       {/* Statistik Produksi */}
-      <Section title="🏢 Produksi & Statistik">
+      <Section title="Produksi & Statistik">
         <Info label="Produksi" value={detail.Production} />
         <Info label="Box Office" value={detail.BoxOffice} />
         <Info label="Tersedia DVD" value={detail.DVD} />
@@ -109,7 +109,7 @@ export default function DetailScreen() {
       </Section>
 
       {/* Ratings */}
-      <Section title="📊 Ratings & Review">
+      <Section title="Ratings & Review">
         <Info label="Metascore" value={detail.Metascore} />
         {detail.Ratings?.map((rating: any, index: number) => (
           <Info key={index} label={rating.Source} value={rating.Value} />
