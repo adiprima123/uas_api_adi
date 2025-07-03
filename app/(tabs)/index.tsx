@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1E1E1E',
     borderRadius: 50,
     paddingHorizontal: 20,
-    height: 80,
+    height: 70,
   },
   searchIcon: {
     marginRight: 10,
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     marginBottom: 25,
-    gap: 10,
+    gap: 15,
   },
   filterButton: {
     borderWidth: 1.5,
@@ -279,6 +279,14 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     marginHorizontal: 4,
     backgroundColor: '#1E1E1E',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 45,
   },
   filterButtonActive: {
     backgroundColor: '#FFD700',
@@ -286,7 +294,7 @@ const styles = StyleSheet.create({
   },
   filterText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '600',
     textTransform: 'capitalize',
   },
@@ -304,8 +312,8 @@ const styles = StyleSheet.create({
 },
 
 barItem: {
-  width: 20,         // bentuk gepeng
-  height: 4,         // tipis
+  width: 20,         
+  height: 4,        
   borderRadius: 2,
   backgroundColor: '#444',
   opacity: 0.4,
