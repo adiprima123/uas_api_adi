@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -14,7 +15,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
 
@@ -36,24 +36,22 @@ const banners = [
 
 export default function HomeScreen() {
   const [search, setSearch] = useState('');
+  const [typeFilter, setTypeFilter] = useState<'movie' | 'series' | 'episode'>('movie');
   const [movies, setMovies] = useState<Movie[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [activeBanner, setActiveBanner] = useState(0);
   const router = useRouter();
-
   const bannerRef = useRef<ScrollView>(null);
 
-  // Auto slide banner setiap 5 detik
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveBanner(prev => {
+      setActiveBanner((prev) => {
         const next = (prev + 1) % banners.length;
         bannerRef.current?.scrollTo({ x: next * width, animated: true });
         return next;
       });
     }, 5000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -74,13 +72,13 @@ export default function HomeScreen() {
     setMovies(null);
 
     try {
-      const response = await fetch(`https://www.omdbapi.com/?apikey=b45dad4f&s=${search}`);
+      const response = await fetch(`https://www.omdbapi.com/?apikey=b45dad4f&s=${search}&type=${typeFilter}`);
       const data = await response.json();
 
       if (data.Response === 'True') {
         setMovies(data.Search);
       } else {
-        setError('Judul tidak ditemukan');
+        setError(`Maaf film ini tidak ada ${typeFilter}.`);
       }
     } catch (e) {
       setError('Terjadi kesalahan saat mengambil data.');
@@ -105,15 +103,15 @@ export default function HomeScreen() {
           <Text style={styles.meta}>•</Text>
           <Text style={styles.meta}>{item.Type}</Text>
         </View>
-      </View> 
+      </View>
       <Ionicons name="chevron-forward" size={24} color="#888" />
     </TouchableOpacity>
   );
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Banner & Search */}
       <View style={styles.stickyHeader}>
+        {/* Banner */}
         <View style={styles.bannerWrapper}>
           <ScrollView
             ref={bannerRef}
@@ -127,32 +125,26 @@ export default function HomeScreen() {
               <Image key={index} source={img} style={styles.banner} />
             ))}
           </ScrollView>
-
-          {/* Gradient Overlay */}
-          <LinearGradient
-            colors={['transparent', '#121212']}
-            style={styles.gradientOverlay}
-          />
+          <LinearGradient colors={['transparent', '#121212']} style={styles.gradientOverlay} />
         </View>
 
-        {/* Indicator */}
+        {/* Progress Bar */}
         <View style={styles.progressBarContainer}>
-  {banners.map((_, index) => (
-    <View
-      key={index}
-      style={[
-        styles.progressBarSegment,
-        {
-          backgroundColor: index === activeBanner ? '#FFD700' : '#333',
-          flex: 1,
-        },
-      ]}
-    />
-  ))}
-</View>
+          {banners.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.progressBarSegment,
+                {
+                  backgroundColor: index === activeBanner ? '#FFD700' : '#333',
+                  flex: 1,
+                },
+              ]}
+            />
+          ))}
+        </View>
 
-
-        {/* Search Bar */}
+        {/* Search Input */}
         <View style={styles.searchContainer}>
           <View style={styles.searchInputContainer}>
             <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
@@ -166,9 +158,35 @@ export default function HomeScreen() {
             />
           </View>
         </View>
+
+        {/* Type Filter */}
+        <View style={styles.filterContainer}>
+          {['movie', 'series', 'episode'].map((type) => (
+            <TouchableOpacity
+              key={type}
+              style={[
+                styles.filterButton,
+                typeFilter === type && styles.filterButtonActive,
+              ]}
+              onPress={() => {
+                setTypeFilter(type as 'movie' | 'series' | 'episode');
+                fetchMovies(); // otomatis fetch ketika ganti type
+              }}
+            >
+              <Text
+                style={[
+                  styles.filterText,
+                  typeFilter === type && styles.filterTextActive,
+                ]}
+              >
+                {type}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
 
-      {/* Movie Content */}
+      {/* Movie Results */}
       <ScrollView style={styles.scrollArea}>
         {loading ? (
           <View style={styles.loadingContainer}>
@@ -177,17 +195,11 @@ export default function HomeScreen() {
         ) : error ? (
           <View style={styles.emptyContainer}>
             <Ionicons
-              name={error === 'Judul tidak ditemukan' ? "sad-outline" : "search-outline"}
+              name="sad-outline"
               size={60}
               color="#888"
             />
-            <Text style={styles.infoText}>
-              {error === 'Anda harus cari film terlebih dahulu.'
-                ? '🔎 Cari film favorit Anda'
-                : error === 'Judul tidak ditemukan'
-                  ? 'Film tidak ditemukan. Coba kata kunci lain.'
-                  : error}
-            </Text>
+            <Text style={styles.infoText}>{error}</Text>
           </View>
         ) : movies ? (
           <>
@@ -232,18 +244,6 @@ const styles = StyleSheet.create({
     right: 0,
     height: 200,
   },
-  indicatorContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: -20,
-    marginBottom: 16,
-  },
-  indicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 4,
-  },
   searchContainer: {
     flexDirection: 'row',
     marginBottom: 25,
@@ -269,13 +269,58 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFF',
   },
-  
+  filterContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 25,
+    gap: 10,
+  },
+  filterButton: {
+    borderWidth: 1.5,
+    borderColor: '#555',
+    borderRadius: 25,
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    marginHorizontal: 4,
+    backgroundColor: '#1E1E1E',
+  },
+  filterButtonActive: {
+    backgroundColor: '#FFD700',
+    borderColor: '#FFD700',
+  },
+  filterText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
+    textTransform: 'capitalize',
+  },
+  filterTextActive: {
+    color: '#121212',
+    fontWeight: 'bold',
+  },
+  progressBarContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 6,
+    marginTop: -20,
+    marginBottom: 16,
+    marginHorizontal: 230,
+    borderRadius: 3,
+    overflow: 'hidden',
+    backgroundColor: '#222',
+  },
+  progressBarSegment: {
+    height: 6,
+    marginHorizontal: 1,
+    borderRadius: 3,
+  },
   card: {
     flexDirection: 'row',
     backgroundColor: '#1E1E1E',
     marginHorizontal: 20,
     marginBottom: 15,
-    borderRadius: 20,
+    borderRadius: 30,
     padding: 12,
     alignItems: 'center',
     shadowColor: '#000',
@@ -283,7 +328,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 3,
-    
   },
   poster: {
     width: 70,
@@ -347,24 +391,4 @@ const styles = StyleSheet.create({
   scrollArea: {
     flex: 1,
   },
-
-  progressBarContainer: {
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: 6,
-  marginTop: -20,
-  marginBottom: 16,
-  marginHorizontal: 230,
-  borderRadius: 3,
-  overflow: 'hidden',
-  backgroundColor: '#222', // background dasar bar
-},
-
-progressBarSegment: {
-  height: 6,
-  marginHorizontal: 1,
-  borderRadius: 3,
-},
-
 });
