@@ -87,6 +87,13 @@ export default function HomeScreen() {
     }
   };
 
+  // useEffect untuk fetch saat typeFilter berubah
+  useEffect(() => {
+    if (search.trim()) {
+      fetchMovies();
+    }
+  }, [typeFilter]);
+
   const renderMovie = ({ item }: { item: Movie }) => (
     <TouchableOpacity
       style={styles.card}
@@ -127,18 +134,19 @@ export default function HomeScreen() {
           </ScrollView>
           <LinearGradient colors={['transparent', '#121212']} style={styles.gradientOverlay} />
         </View>
-        {/* Indicator - Bar Gepeng Horizontal */}
-<View style={styles.bannerIndicator}>
-  {banners.map((_, index) => (
-    <View
-      key={index}
-      style={[
-        styles.barItem,
-        index === activeBanner && styles.barItemActive,
-      ]}
-    />
-  ))}
-</View>
+
+        {/* Indicator bar gepeng */}
+        <View style={styles.bannerIndicator}>
+          {banners.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.barItem,
+                index === activeBanner && styles.barItemActive,
+              ]}
+            />
+          ))}
+        </View>
 
         {/* Search Input */}
         <View style={styles.searchContainer}>
@@ -164,10 +172,7 @@ export default function HomeScreen() {
                 styles.filterButton,
                 typeFilter === type && styles.filterButtonActive,
               ]}
-              onPress={() => {
-                setTypeFilter(type as 'movie' | 'series' | 'episode');
-                fetchMovies(); // otomatis fetch ketika ganti type
-              }}
+              onPress={() => setTypeFilter(type as 'movie' | 'series' | 'episode')}
             >
               <Text
                 style={[
@@ -190,11 +195,7 @@ export default function HomeScreen() {
           </View>
         ) : error ? (
           <View style={styles.emptyContainer}>
-            <Ionicons
-              name="sad-outline"
-              size={60}
-              color="#888"
-            />
+            <Ionicons name="sad-outline" size={60} color="#888" />
             <Text style={styles.infoText}>{error}</Text>
           </View>
         ) : movies ? (
@@ -217,7 +218,7 @@ export default function HomeScreen() {
       </ScrollView>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   safeArea: {
