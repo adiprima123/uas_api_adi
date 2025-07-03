@@ -7,18 +7,38 @@ import {
   ActivityIndicator,
   ScrollView,
   StyleSheet,
+  Dimensions,
+  ImageBackground,
 } from 'react-native';
+
+const { width } = Dimensions.get('window');
 
 type MovieDetail = {
   Title: string;
   Year: string;
+  Rated: string;
+  Released: string;
   Runtime: string;
   Genre: string;
   Director: string;
+  Writer: string;
   Actors: string;
   Plot: string;
+  Language: string;
+  Country: string;
+  Awards: string;
   Poster: string;
+  Ratings: { Source: string; Value: string }[];
+  Metascore: string;
   imdbRating: string;
+  imdbVotes: string;
+  imdbID: string;
+  Type: string;
+  DVD: string;
+  BoxOffice: string;
+  Production: string;
+  Website: string;
+  Response: string;
 };
 
 export default function DetailScreen() {
@@ -32,9 +52,8 @@ export default function DetailScreen() {
 
     const fetchDetail = async () => {
       try {
-        const response = await fetch(`https://www.omdbapi.com/?apikey=b45dad4f&i=${imdbID}`);
-        const data = await response.json();
-
+        const res = await fetch(`https://www.omdbapi.com/?apikey=b45dad4f&i=${imdbID}`);
+        const data = await res.json();
         if (data.Response === 'True') {
           setDetail(data);
         } else {
@@ -68,71 +87,170 @@ export default function DetailScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Image source={{ uri: detail.Poster }} style={styles.poster} />
-      <View style={styles.content}>
-        <Text style={styles.title}>{detail.Title}</Text>
-        <Text style={styles.subtitle}>{detail.Year} • {detail.Genre} • {detail.Runtime}</Text>
-        <Text style={styles.label}>🎬 Sutradara:</Text>
-        <Text style={styles.text}>{detail.Director}</Text>
+      <ImageBackground
+        source={{ uri: detail.Poster }}
+        style={styles.background}
+        blurRadius={30}
+      >
+        <View style={styles.overlay}>
+          <Image source={{ uri: detail.Poster }} style={styles.posterCard} />
+          <Text style={styles.title}>{detail.Title}</Text>
+          <Text style={styles.subtitle}>
+            {detail.Year} • {detail.Runtime} • {detail.Genre}
+          </Text>
+          <View style={styles.ratingBadge}>
+            <Text style={styles.ratingText}>⭐ {detail.imdbRating} / 10</Text>
+          </View>
+        </View>
+      </ImageBackground>
 
-        <Text style={styles.label}>🎭 Aktor:</Text>
-        <Text style={styles.text}>{detail.Actors}</Text>
-
-        <Text style={styles.label}>📝 Sinopsis:</Text>
-        <Text style={styles.text}>{detail.Plot}</Text>
-
-        <Text style={styles.rating}>⭐ Rating IMDb: {detail.imdbRating}</Text>
+      <View style={styles.sectionCard}>
+        <Info label="🎬 Sutradara" value={detail.Director} />
+        <Info label="📝 Penulis" value={detail.Writer} />
+        <Info label="🎭 Aktor" value={detail.Actors} />
       </View>
+
+      <View style={styles.sectionCard}>
+        <Info label="🌐 Bahasa" value={detail.Language} />
+        <Info label="🏳️ Negara" value={detail.Country} />
+        <Info label="🏆 Penghargaan" value={detail.Awards} />
+      </View>
+
+      <View style={styles.sectionCard}>
+        <View style={styles.dividerLabel}>
+          <Text style={styles.sectionTitle}>📖 Sinopsis</Text>
+          <View style={styles.line} />
+        </View>
+        <Text style={styles.plot}>{detail.Plot}</Text>
+      </View>
+
+      <View style={styles.sectionCard}>
+        <Info label="📅 Rilis" value={detail.Released} />
+        <Info label="🔞 Rating" value={detail.Rated} />
+        <Info label="💽 DVD" value={detail.DVD} />
+        <Info label="💵 Box Office" value={detail.BoxOffice} />
+        <Info label="🏢 Produksi" value={detail.Production} />
+        <Info label="🔗 Website" value={detail.Website !== 'N/A' ? detail.Website : 'Tidak tersedia'} />
+      </View>
+
+      <View style={styles.bottomSpace} />
     </ScrollView>
+  );
+}
+
+function Info({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={{ marginBottom: 10 }}>
+      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.text}>{value}</Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    flex: 1,
+    backgroundColor: '#121212',
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 60,
+    backgroundColor: '#121212',
   },
   errorText: {
-    color: 'red',
+    color: '#ff6b6b',
     fontSize: 16,
   },
-  poster: {
+  background: {
     width: '100%',
-    height: 400,
-    resizeMode: 'cover',
+    height: 480,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
   },
-  content: {
-    padding: 16,
+  overlay: {
+    backgroundColor: 'rgba(18,18,18,0.75)',
+    padding: 20,
+    alignItems: 'center',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    width: '100%',
+  },
+  posterCard: {
+    width: 140,
+    height: 210,
+    borderRadius: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#444',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 4,
+    color: '#fff',
+    textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 12,
+    fontSize: 14,
+    color: '#ccc',
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  ratingBadge: {
+    marginTop: 10,
+    backgroundColor: '#FFD700',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  ratingText: {
+    color: '#121212',
+    fontWeight: 'bold',
+  },
+  sectionCard: {
+    backgroundColor: '#1E1E1E',
+    marginHorizontal: 20,
+    marginTop: 20,
+    padding: 16,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
+    color: '#FFD700',
     fontWeight: '600',
-    marginTop: 12,
   },
   text: {
     fontSize: 15,
-    color: '#444',
-    marginTop: 4,
+    color: '#ddd',
+    marginTop: 2,
   },
-  rating: {
+  plot: {
+    color: '#ccc',
+    fontSize: 15,
+    marginTop: 10,
+    lineHeight: 22,
+  },
+  sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginTop: 20,
-    color: '#FFD700',
+    color: '#fff',
+  },
+  dividerLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#444',
+    marginLeft: 10,
+  },
+  bottomSpace: {
+    height: 40,
   },
 });
