@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
+  Animated,
   Dimensions,
   FlatList,
   Image,
@@ -14,6 +14,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -41,24 +42,27 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [activeBanner, setActiveBanner] = useState(0);
+
   const router = useRouter();
+  const scrollX = useRef(new Animated.Value(0)).current;
   const bannerRef = useRef<ScrollView>(null);
 
+  // Auto swipe banner setiap 5 detik
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveBanner((prev) => {
-        const next = (prev + 1) % banners.length;
-        bannerRef.current?.scrollTo({ x: next * width, animated: true });
-        return next;
-      });
+      const next = (activeBanner + 1) % banners.length;
+      bannerRef.current?.scrollTo({ x: next * width, animated: true });
+      setActiveBanner(next);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [activeBanner]);
 
-  const handleBannerScroll = (event: any) => {
-    const slide = Math.round(event.nativeEvent.contentOffset.x / width);
-    setActiveBanner(slide);
-  };
+  // Auto fetch ketika filter berubah
+  useEffect(() => {
+    if (search.trim()) {
+      fetchMovies();
+    }
+  }, [typeFilter]);
 
   const fetchMovies = async () => {
     if (!search.trim()) {
@@ -87,20 +91,14 @@ export default function HomeScreen() {
     }
   };
 
-  // useEffect untuk fetch saat typeFilter berubah
-  useEffect(() => {
-    if (search.trim()) {
-      fetchMovies();
-    }
-  }, [typeFilter]);
-
   const renderMovie = ({ item }: { item: Movie }) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => router.push(`../detail/${item.imdbID}`)}
-    >
+    <TouchableOpacity style={styles.card} onPress={() => router.push(`../detail/${item.imdbID}`)}>
       <Image
-        source={{ uri: item.Poster !== 'N/A' ? item.Poster : 'https://via.placeholder.com/100x150?text=No+Poster' }}
+        source={{
+          uri: item.Poster !== 'N/A'
+            ? item.Poster
+            : 'https://via.placeholder.com/100x150?text=No+Poster',
+        }}
         style={styles.poster}
       />
       <View style={styles.info}>
@@ -120,35 +118,64 @@ export default function HomeScreen() {
       <View style={styles.stickyHeader}>
         {/* Banner */}
         <View style={styles.bannerWrapper}>
-          <ScrollView
+          <Animated.ScrollView
             ref={bannerRef}
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
-            onScroll={handleBannerScroll}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+              { useNativeDriver: false }
+            )}
             scrollEventThrottle={16}
           >
             {banners.map((img, index) => (
               <Image key={index} source={img} style={styles.banner} />
             ))}
-          </ScrollView>
+          </Animated.ScrollView>
           <LinearGradient colors={['transparent', '#121212']} style={styles.gradientOverlay} />
         </View>
 
-        {/* Indicator bar gepeng */}
+        {/* Bar Indicator */}
         <View style={styles.bannerIndicator}>
-          {banners.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.barItem,
-                index === activeBanner && styles.barItemActive,
-              ]}
-            />
-          ))}
+          {banners.map((_, index) => {
+            const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
+
+            const widthAnim = scrollX.interpolate({
+              inputRange,
+              outputRange: [20, 40, 20],
+              extrapolate: 'clamp',
+            });
+
+            const opacityAnim = scrollX.interpolate({
+              inputRange,
+              outputRange: [0.4, 1, 0.4],
+              extrapolate: 'clamp',
+            });
+
+            const backgroundColorAnim = scrollX.interpolate({
+              inputRange,
+              outputRange: ['#888888', '#FFD700', '#888888'],
+              extrapolate: 'clamp',
+            });
+
+            return (
+              <Animated.View
+                key={index}
+                style={[
+                  styles.barItem,
+                  {
+                    width: widthAnim,
+                    opacity: opacityAnim,
+                    backgroundColor: backgroundColorAnim,
+                  },
+                ]}
+              />
+            );
+          })}
         </View>
 
-        {/* Search Input */}
+        {/* Search */}
         <View style={styles.searchContainer}>
           <View style={styles.searchInputContainer}>
             <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
@@ -163,23 +190,15 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Type Filter */}
+        {/* Filter */}
         <View style={styles.filterContainer}>
           {['movie', 'series', 'episode'].map((type) => (
             <TouchableOpacity
               key={type}
-              style={[
-                styles.filterButton,
-                typeFilter === type && styles.filterButtonActive,
-              ]}
+              style={[styles.filterButton, typeFilter === type && styles.filterButtonActive]}
               onPress={() => setTypeFilter(type as 'movie' | 'series' | 'episode')}
             >
-              <Text
-                style={[
-                  styles.filterText,
-                  typeFilter === type && styles.filterTextActive,
-                ]}
-              >
+              <Text style={[styles.filterText, typeFilter === type && styles.filterTextActive]}>
                 {type}
               </Text>
             </TouchableOpacity>
@@ -218,20 +237,26 @@ export default function HomeScreen() {
       </ScrollView>
     </SafeAreaView>
   );
-};
+}
+
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#121212',
   },
+  stickyHeader: {
+    backgroundColor: '#121212',
+    zIndex: 10,
+    elevation: 10,
+  },
   bannerWrapper: {
-    height: 300, // <== updated
+    height: 300,
     position: 'relative',
   },
   banner: {
     width: width,
-    height: 300, // <== updated
+    height: 300,
     resizeMode: 'cover',
   },
   gradientOverlay: {
@@ -239,7 +264,20 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 300, // <== updated
+    height: 300,
+  },
+  bannerIndicator: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: -18,
+    marginBottom: 20,
+  },
+  barItem: {
+    height: 4,
+    borderRadius: 2,
+    marginHorizontal: 3,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -278,16 +316,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     paddingHorizontal: 24,
     paddingVertical: 14,
-    marginHorizontal: 4,
     backgroundColor: '#1E1E1E',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 3,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 45,
   },
   filterButtonActive: {
     backgroundColor: '#FFD700',
@@ -303,29 +332,9 @@ const styles = StyleSheet.create({
     color: '#121212',
     fontWeight: 'bold',
   },
-  bannerIndicator: {
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  gap: 6,
-  marginTop: -18,
-  marginBottom: 20,
-},
-
-barItem: {
-  width: 20,         
-  height: 4,        
-  borderRadius: 2,
-  backgroundColor: '#444',
-  opacity: 0.4,
-},
-
-barItemActive: {
-  backgroundColor: '#FFD700',
-  opacity: 1,
-},
-
-
+  scrollArea: {
+    flex: 1,
+  },
   card: {
     flexDirection: 'row',
     backgroundColor: '#1E1E1E',
@@ -393,13 +402,5 @@ barItemActive: {
     marginTop: 20,
     textAlign: 'center',
     paddingHorizontal: 40,
-  },
-  stickyHeader: {
-    backgroundColor: '#121212',
-    zIndex: 10,
-    elevation: 10,
-  },
-  scrollArea: {
-    flex: 1,
   },
 });
