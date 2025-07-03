@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
 
@@ -104,46 +105,54 @@ export default function HomeScreen() {
           <Text style={styles.meta}>•</Text>
           <Text style={styles.meta}>{item.Type}</Text>
         </View>
-      </View>
+      </View> 
       <Ionicons name="chevron-forward" size={24} color="#888" />
     </TouchableOpacity>
   );
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Banner + Header + Search */}
+      {/* Banner & Search */}
       <View style={styles.stickyHeader}>
-        {/* Banner */}
-        <ScrollView
-          ref={bannerRef}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onScroll={handleBannerScroll}
-          scrollEventThrottle={16}
-          style={styles.bannerWrapper}
-        >
-          {banners.map((img, index) => (
-            <Image key={index} source={img} style={styles.banner} />
-          ))}
-        </ScrollView>
+        <View style={styles.bannerWrapper}>
+          <ScrollView
+            ref={bannerRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={handleBannerScroll}
+            scrollEventThrottle={16}
+          >
+            {banners.map((img, index) => (
+              <Image key={index} source={img} style={styles.banner} />
+            ))}
+          </ScrollView>
 
-        <View style={styles.indicatorContainer}>
-          {banners.map((_, index) => (
-            <View
-              key={index}
-              style={[styles.indicator, { backgroundColor: index === activeBanner ? '#FFD700' : '#bbb' }]}
-            />
-          ))}
+          {/* Gradient Overlay */}
+          <LinearGradient
+            colors={['transparent', '#121212']}
+            style={styles.gradientOverlay}
+          />
         </View>
 
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>MovieFinder</Text>
-          <Ionicons name="notifications-outline" size={24} color="#fff" />
-        </View>
+        {/* Indicator */}
+        <View style={styles.progressBarContainer}>
+  {banners.map((_, index) => (
+    <View
+      key={index}
+      style={[
+        styles.progressBarSegment,
+        {
+          backgroundColor: index === activeBanner ? '#FFD700' : '#333',
+          flex: 1,
+        },
+      ]}
+    />
+  ))}
+</View>
 
-        {/* Search */}
+
+        {/* Search Bar */}
         <View style={styles.searchContainer}>
           <View style={styles.searchInputContainer}>
             <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
@@ -156,9 +165,6 @@ export default function HomeScreen() {
               onSubmitEditing={fetchMovies}
             />
           </View>
-          <TouchableOpacity style={styles.button} onPress={fetchMovies}>
-            <Text style={styles.buttonText}>Cari</Text>
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -211,17 +217,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
   },
   bannerWrapper: {
-    height: 250,
+    height: 400,
+    position: 'relative',
   },
   banner: {
     width: width,
-    height: 250,
+    height: 400,
     resizeMode: 'cover',
+  },
+  gradientOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 200,
   },
   indicatorContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 8,
+    marginTop: -20,
     marginBottom: 16,
   },
   indicator: {
@@ -229,18 +243,6 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     marginHorizontal: 4,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginHorizontal: 20,
-    marginBottom: 20,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -253,9 +255,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#1E1E1E',
-    borderRadius: 12,
-    paddingHorizontal: 15,
-    height: 50,
+    borderRadius: 50,
+    paddingHorizontal: 20,
+    height: 80,
   },
   searchIcon: {
     marginRight: 10,
@@ -267,31 +269,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFF',
   },
-  button: {
-    backgroundColor: '#FFD700',
-    marginLeft: 10,
-    paddingHorizontal: 20,
-    height: 50,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 5,
-  },
-  buttonText: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    color: '#121212',
-  },
+  
   card: {
     flexDirection: 'row',
     backgroundColor: '#1E1E1E',
     marginHorizontal: 20,
     marginBottom: 15,
-    borderRadius: 12,
+    borderRadius: 20,
     padding: 12,
     alignItems: 'center',
     shadowColor: '#000',
@@ -299,6 +283,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 3,
+    
   },
   poster: {
     width: 70,
@@ -362,4 +347,24 @@ const styles = StyleSheet.create({
   scrollArea: {
     flex: 1,
   },
+
+  progressBarContainer: {
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: 6,
+  marginTop: -20,
+  marginBottom: 16,
+  marginHorizontal: 230,
+  borderRadius: 3,
+  overflow: 'hidden',
+  backgroundColor: '#222', // background dasar bar
+},
+
+progressBarSegment: {
+  height: 6,
+  marginHorizontal: 1,
+  borderRadius: 3,
+},
+
 });
