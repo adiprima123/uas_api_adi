@@ -27,10 +27,10 @@
 
   const banners = [
     require('../../assets/images/insideout2.png'),
-    require('../../assets/images/insideout2.png'),
-    require('../../assets/images/insideout2.png'),
-    require('../../assets/images/insideout2.png'),
-    require('../../assets/images/insideout2.png'),
+    require('../../assets/images/Marvel.jpg'),
+    require('../../assets/images/itaewon.jpg'),
+    require('../../assets/images/venom.jpg'),
+    require('../../assets/images/next door exo.jpg'),
   ];
 
   export default function HomeScreen() {

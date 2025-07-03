@@ -1,44 +1,20 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  Dimensions,
+  View,
+  Text,
   Image,
-  ImageBackground,
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
-  Text,
-  View,
+  Dimensions,
+  ImageBackground,
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
 type MovieDetail = {
-  Title: string;
-  Year: string;
-  Rated: string;
-  Released: string;
-  Runtime: string;
-  Genre: string;
-  Director: string;
-  Writer: string;
-  Actors: string;
-  Plot: string;
-  Language: string;
-  Country: string;
-  Awards: string;
-  Poster: string;
-  Ratings: { Source: string; Value: string }[];
-  Metascore: string;
-  imdbRating: string;
-  imdbVotes: string;
-  imdbID: string;
-  Type: string;
-  DVD: string;
-  BoxOffice: string;
-  Production: string;
-  Website: string;
-  Response: string;
+  [key: string]: any;
 };
 
 export default function DetailScreen() {
@@ -104,37 +80,41 @@ export default function DetailScreen() {
         </View>
       </ImageBackground>
 
-      <View style={styles.sectionCard}>
-        <Info label="🎬 Sutradara" value={detail.Director} />
-        <Info label="📝 Penulis" value={detail.Writer} />
-        <Info label="🎭 Aktor" value={detail.Actors} />
-      </View>
+      {/* Informasi Utama */}
+      <Section title="📋 Informasi Umum">
+        <Info label="Sutradara" value={detail.Director} />
+        <Info label="Penulis" value={detail.Writer} />
+        <Info label="Pemeran" value={detail.Actors} />
+        <Info label="Bahasa" value={detail.Language} />
+        <Info label="Negara" value={detail.Country} />
+        <Info label="Tanggal Rilis" value={detail.Released} />
+        <Info label="Durasi" value={detail.Runtime} />
+        <Info label="Rating Usia" value={detail.Rated} />
+      </Section>
 
-      <View style={styles.sectionCard}>
-        <Info label="🌐 Bahasa" value={detail.Language} />
-        <Info label="🏳️ Negara" value={detail.Country} />
-        <Info label="🏆 Penghargaan" value={detail.Awards} />
-      </View>
-
-      <View style={styles.sectionCard}>
-        <View style={styles.dividerLabel}>
-          <Text style={styles.sectionTitle}>📖 Sinopsis</Text>
-          <View style={styles.line} />
-        </View>
+      {/* Sinopsis */}
+      <Section title="📖 Sinopsis">
         <Text style={styles.plot}>{detail.Plot}</Text>
-      </View>
+      </Section>
 
-      <View style={styles.sectionCard}>
-        <Info label="📅 Rilis" value={detail.Released} />
-        <Info label="🔞 Rating" value={detail.Rated} />
-        <Info label="💽 DVD" value={detail.DVD} />
-        <Info label="💵 Box Office" value={detail.BoxOffice} />
-        <Info label="🏢 Produksi" value={detail.Production} />
-        <Info
-          label="🔗 Website"
-          value={detail.Website !== 'N/A' ? detail.Website : 'Tidak tersedia'}
-        />
-      </View>
+      {/* Statistik Produksi */}
+      <Section title="🏢 Produksi & Statistik">
+        <Info label="Produksi" value={detail.Production} />
+        <Info label="Box Office" value={detail.BoxOffice} />
+        <Info label="Tersedia DVD" value={detail.DVD} />
+        <Info label="Website" value={detail.Website !== 'N/A' ? detail.Website : 'Tidak tersedia'} />
+        <Info label="Tipe" value={detail.Type} />
+        <Info label="Penghargaan" value={detail.Awards} />
+        <Info label="Jumlah Voter" value={detail.imdbVotes} />
+      </Section>
+
+      {/* Ratings */}
+      <Section title="📊 Ratings & Review">
+        <Info label="Metascore" value={detail.Metascore} />
+        {detail.Ratings?.map((rating: any, index: number) => (
+          <Info key={index} label={rating.Source} value={rating.Value} />
+        ))}
+      </Section>
 
       <View style={styles.bottomSpace} />
     </ScrollView>
@@ -143,12 +123,23 @@ export default function DetailScreen() {
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <View>
+    <View style={{ marginBottom: 10 }}>
       <Text style={styles.label}>{label}</Text>
       <Text style={styles.text}>{value}</Text>
     </View>
   );
 }
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <View style={styles.sectionCard}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      <View style={styles.line} />
+      {children}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -167,13 +158,13 @@ const styles = StyleSheet.create({
   },
   background: {
     width: '100%',
-    height: 520,
+    height: 500,
     justifyContent: 'flex-end',
   },
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingTop: 28,
-    paddingBottom: 32,
+    paddingTop: 30,
+    paddingBottom: 34,
     paddingHorizontal: 20,
     alignItems: 'center',
     borderTopLeftRadius: 30,
@@ -225,7 +216,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#181818',
     marginHorizontal: 20,
     marginTop: 24,
-    padding: 18,
+    padding: 20,
     borderRadius: 20,
     shadowColor: '#000',
     shadowOpacity: 0.25,
@@ -241,31 +232,25 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 15,
     color: '#E0E0E0',
-    marginBottom: 10,
-    lineHeight: 22,
+    lineHeight: 21,
   },
   plot: {
+    fontSize: 15,
     color: '#D3D3D3',
-    fontSize: 15.5,
-    marginTop: 12,
-    lineHeight: 24,
+    lineHeight: 23,
     textAlign: 'justify',
+    marginTop: 10,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
     color: '#FFFFFF',
-  },
-  dividerLabel: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 12,
   },
   line: {
-    flex: 1,
     height: 1.2,
     backgroundColor: '#303030',
-    marginLeft: 12,
+    marginBottom: 16,
   },
   bottomSpace: {
     height: 50,
