@@ -1,14 +1,14 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  Image,
   ActivityIndicator,
+  Dimensions,
+  Image,
+  ImageBackground,
   ScrollView,
   StyleSheet,
-  Dimensions,
-  ImageBackground,
+  Text,
+  View,
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -130,7 +130,10 @@ export default function DetailScreen() {
         <Info label="💽 DVD" value={detail.DVD} />
         <Info label="💵 Box Office" value={detail.BoxOffice} />
         <Info label="🏢 Produksi" value={detail.Production} />
-        <Info label="🔗 Website" value={detail.Website !== 'N/A' ? detail.Website : 'Tidak tersedia'} />
+        <Info
+          label="🔗 Website"
+          value={detail.Website !== 'N/A' ? detail.Website : 'Tidak tersedia'}
+        />
       </View>
 
       <View style={styles.bottomSpace} />
@@ -140,81 +143,92 @@ export default function DetailScreen() {
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <View style={{ marginBottom: 10 }}>
+    <View>
       <Text style={styles.label}>{label}</Text>
       <Text style={styles.text}>{value}</Text>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
+    backgroundColor: '#0E0E0E',
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#121212',
+    backgroundColor: '#0E0E0E',
   },
   errorText: {
-    color: '#ff6b6b',
+    color: '#FF6B6B',
     fontSize: 16,
+    fontWeight: '500',
   },
   background: {
     width: '100%',
-    height: 480,
+    height: 520,
     justifyContent: 'flex-end',
-    alignItems: 'center',
   },
   overlay: {
-    backgroundColor: 'rgba(18,18,18,0.75)',
-    padding: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingTop: 28,
+    paddingBottom: 32,
+    paddingHorizontal: 20,
     alignItems: 'center',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    width: '100%',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    marginTop: -40,
   },
   posterCard: {
-    width: 140,
-    height: 210,
-    borderRadius: 12,
+    width: 160,
+    height: 240,
+    borderRadius: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#444',
+    borderColor: '#333',
+    backgroundColor: '#1F1F1F',
+    shadowColor: '#000',
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 5,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#FAFAFA',
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 14,
-    color: '#ccc',
-    marginTop: 4,
+    fontSize: 15,
+    color: '#BDBDBD',
+    marginTop: 6,
     textAlign: 'center',
   },
   ratingBadge: {
-    marginTop: 10,
+    marginTop: 12,
     backgroundColor: '#FFD700',
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 20,
+    shadowColor: '#FFD700',
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 2,
   },
   ratingText: {
-    color: '#121212',
-    fontWeight: 'bold',
+    color: '#1A1A1A',
+    fontWeight: '700',
+    fontSize: 13.5,
   },
   sectionCard: {
-    backgroundColor: '#1E1E1E',
+    backgroundColor: '#181818',
     marginHorizontal: 20,
-    marginTop: 20,
-    padding: 16,
-    borderRadius: 16,
+    marginTop: 24,
+    padding: 18,
+    borderRadius: 20,
     shadowColor: '#000',
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.25,
     shadowRadius: 8,
     elevation: 4,
   },
@@ -222,35 +236,38 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#FFD700',
     fontWeight: '600',
+    marginBottom: 2,
   },
   text: {
     fontSize: 15,
-    color: '#ddd',
-    marginTop: 2,
+    color: '#E0E0E0',
+    marginBottom: 10,
+    lineHeight: 22,
   },
   plot: {
-    color: '#ccc',
-    fontSize: 15,
-    marginTop: 10,
-    lineHeight: 22,
+    color: '#D3D3D3',
+    fontSize: 15.5,
+    marginTop: 12,
+    lineHeight: 24,
+    textAlign: 'justify',
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   dividerLabel: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   line: {
     flex: 1,
-    height: 1,
-    backgroundColor: '#444',
-    marginLeft: 10,
+    height: 1.2,
+    backgroundColor: '#303030',
+    marginLeft: 12,
   },
   bottomSpace: {
-    height: 40,
+    height: 50,
   },
 });
