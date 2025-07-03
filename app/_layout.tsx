@@ -19,11 +19,12 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="SplashScreen" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)/index" options={{ headerShown: false }} />
-        <Stack.Screen name="/(detail)/[imdbID]" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
+  <Stack.Screen name="SplashScreen" options={{ headerShown: false }} />
+  <Stack.Screen name="(tabs)/index" options={{ headerShown: false }} />
+  <Stack.Screen name="detail/[imdbID]" options={{ headerShown: false }} />
+  <Stack.Screen name="+not-found" />
+</Stack>
+
       <StatusBar style="auto" />
     </ThemeProvider>
   );

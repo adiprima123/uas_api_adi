@@ -127,22 +127,18 @@ export default function HomeScreen() {
           </ScrollView>
           <LinearGradient colors={['transparent', '#121212']} style={styles.gradientOverlay} />
         </View>
-
-        {/* Progress Bar */}
-        <View style={styles.progressBarContainer}>
-          {banners.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.progressBarSegment,
-                {
-                  backgroundColor: index === activeBanner ? '#FFD700' : '#333',
-                  flex: 1,
-                },
-              ]}
-            />
-          ))}
-        </View>
+        {/* Indicator - Bar Gepeng Horizontal */}
+<View style={styles.bannerIndicator}>
+  {banners.map((_, index) => (
+    <View
+      key={index}
+      style={[
+        styles.barItem,
+        index === activeBanner && styles.barItemActive,
+      ]}
+    />
+  ))}
+</View>
 
         {/* Search Input */}
         <View style={styles.searchContainer}>
@@ -229,12 +225,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
   },
   bannerWrapper: {
-    height: 400,
+    height: 300, // <== updated
     position: 'relative',
   },
   banner: {
     width: width,
-    height: 400,
+    height: 300, // <== updated
     resizeMode: 'cover',
   },
   gradientOverlay: {
@@ -242,7 +238,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 200,
+    height: 300, // <== updated
   },
   searchContainer: {
     flexDirection: 'row',
@@ -298,23 +294,29 @@ const styles = StyleSheet.create({
     color: '#121212',
     fontWeight: 'bold',
   },
-  progressBarContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 6,
-    marginTop: -20,
-    marginBottom: 16,
-    marginHorizontal: 230,
-    borderRadius: 3,
-    overflow: 'hidden',
-    backgroundColor: '#222',
-  },
-  progressBarSegment: {
-    height: 6,
-    marginHorizontal: 1,
-    borderRadius: 3,
-  },
+  bannerIndicator: {
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: 6,
+  marginTop: -18,
+  marginBottom: 20,
+},
+
+barItem: {
+  width: 20,         // bentuk gepeng
+  height: 4,         // tipis
+  borderRadius: 2,
+  backgroundColor: '#444',
+  opacity: 0.4,
+},
+
+barItemActive: {
+  backgroundColor: '#FFD700',
+  opacity: 1,
+},
+
+
   card: {
     flexDirection: 'row',
     backgroundColor: '#1E1E1E',

@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   View,
@@ -9,7 +9,9 @@ import {
   StyleSheet,
   Dimensions,
   ImageBackground,
+  TouchableOpacity,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
@@ -19,6 +21,7 @@ type MovieDetail = {
 
 export default function DetailScreen() {
   const { imdbID } = useLocalSearchParams();
+  const router = useRouter();
   const [detail, setDetail] = useState<MovieDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -62,65 +65,73 @@ export default function DetailScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <ImageBackground
-        source={{ uri: detail.Poster }}
-        style={styles.background}
-        blurRadius={30}
-      >
-        <View style={styles.overlay}>
-          <Image source={{ uri: detail.Poster }} style={styles.posterCard} />
-          <Text style={styles.title}>{detail.Title}</Text>
-          <Text style={styles.subtitle}>
-            {detail.Year} • {detail.Runtime} • {detail.Genre}
-          </Text>
-          <View style={styles.ratingBadge}>
-            <Text style={styles.ratingText}>⭐ {detail.imdbRating} / 10</Text>
+    <>
+      {/* Tombol Back */}
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={24} color="#fff" />
+      </TouchableOpacity>
+
+      <ScrollView style={styles.container}>
+        <ImageBackground
+          source={{ uri: detail.Poster }}
+          style={styles.background}
+          blurRadius={30}
+        >
+          <View style={styles.overlay}>
+            <Image source={{ uri: detail.Poster }} style={styles.posterCard} />
+            <Text style={styles.title}>{detail.Title}</Text>
+            <Text style={styles.subtitle}>
+              {detail.Year} • {detail.Runtime} • {detail.Genre}
+            </Text>
+            <View style={styles.ratingBadge}>
+              <Text style={styles.ratingText}>⭐ {detail.imdbRating} / 10</Text>
+            </View>
           </View>
-        </View>
-      </ImageBackground>
+        </ImageBackground>
 
-      {/* Informasi Utama */}
-      <Section title="Informasi Umum">
-        <Info label="Sutradara" value={detail.Director} />
-        <Info label="Penulis" value={detail.Writer} />
-        <Info label="Pemeran" value={detail.Actors} />
-        <Info label="Bahasa" value={detail.Language} />
-        <Info label="Negara" value={detail.Country} />
-        <Info label="Tanggal Rilis" value={detail.Released} />
-        <Info label="Durasi" value={detail.Runtime} />
-        <Info label="Rating Usia" value={detail.Rated} />
-      </Section>
+        {/* Informasi Umum */}
+        <Section title="Informasi Umum">
+          <Info label="Sutradara" value={detail.Director} />
+          <Info label="Penulis" value={detail.Writer} />
+          <Info label="Pemeran" value={detail.Actors} />
+          <Info label="Bahasa" value={detail.Language} />
+          <Info label="Negara" value={detail.Country} />
+          <Info label="Tanggal Rilis" value={detail.Released} />
+          <Info label="Durasi" value={detail.Runtime} />
+          <Info label="Rating Usia" value={detail.Rated} />
+        </Section>
 
-      {/* Sinopsis */}
-      <Section title="Sinopsis">
-        <Text style={styles.plot}>{detail.Plot}</Text>
-      </Section>
+        {/* Sinopsis */}
+        <Section title="Sinopsis">
+          <Text style={styles.plot}>{detail.Plot}</Text>
+        </Section>
 
-      {/* Statistik Produksi */}
-      <Section title="Produksi & Statistik">
-        <Info label="Produksi" value={detail.Production} />
-        <Info label="Box Office" value={detail.BoxOffice} />
-        <Info label="Tersedia DVD" value={detail.DVD} />
-        <Info label="Website" value={detail.Website !== 'N/A' ? detail.Website : 'Tidak tersedia'} />
-        <Info label="Tipe" value={detail.Type} />
-        <Info label="Penghargaan" value={detail.Awards} />
-        <Info label="Jumlah Voter" value={detail.imdbVotes} />
-      </Section>
+        {/* Statistik Produksi */}
+        <Section title="Produksi & Statistik">
+          <Info label="Produksi" value={detail.Production} />
+          <Info label="Box Office" value={detail.BoxOffice} />
+          <Info label="Tersedia DVD" value={detail.DVD} />
+          <Info label="Website" value={detail.Website !== 'N/A' ? detail.Website : 'Tidak tersedia'} />
+          <Info label="Tipe" value={detail.Type} />
+          <Info label="Penghargaan" value={detail.Awards} />
+          <Info label="Jumlah Voter" value={detail.imdbVotes} />
+        </Section>
 
-      {/* Ratings */}
-      <Section title="Ratings & Review">
-        <Info label="Metascore" value={detail.Metascore} />
-        {detail.Ratings?.map((rating: any, index: number) => (
-          <Info key={index} label={rating.Source} value={rating.Value} />
-        ))}
-      </Section>
+        {/* Ratings */}
+        <Section title="Ratings & Review">
+          <Info label="Metascore" value={detail.Metascore} />
+          {detail.Ratings?.map((rating: any, index: number) => (
+            <Info key={index} label={rating.Source} value={rating.Value} />
+          ))}
+        </Section>
 
-      <View style={styles.bottomSpace} />
-    </ScrollView>
+        <View style={styles.bottomSpace} />
+      </ScrollView>
+    </>
   );
 }
 
+// Reusable Info Component
 function Info({ label, value }: { label: string; value: string }) {
   return (
     <View style={{ marginBottom: 10 }}>
@@ -130,6 +141,7 @@ function Info({ label, value }: { label: string; value: string }) {
   );
 }
 
+// Reusable Section Component
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View style={styles.sectionCard}>
@@ -139,6 +151,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     </View>
   );
 }
+
+// Sembunyikan header default
+export const config = {
+  headerShown: false,
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -254,5 +271,14 @@ const styles = StyleSheet.create({
   },
   bottomSpace: {
     height: 50,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    zIndex: 99,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    padding: 10,
+    borderRadius: 20,
   },
 });
