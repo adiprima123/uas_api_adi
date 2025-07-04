@@ -143,7 +143,7 @@ export default function HomeScreen() {
 
             const widthAnim = scrollX.interpolate({
               inputRange,
-              outputRange: [20, 40, 20],
+              outputRange: [15, 30, 15],
               extrapolate: 'clamp',
             });
 
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   barItem: {
     height: 4,
     borderRadius: 2,
-    marginHorizontal: 3,
+    marginHorizontal: 0.5,
   },
   searchContainer: {
     flexDirection: 'row',
