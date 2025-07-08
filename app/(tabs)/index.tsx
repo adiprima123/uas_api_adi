@@ -37,7 +37,7 @@ const banners = [
 
 export default function HomeScreen() {
   const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState<'movie' | 'series' | 'episode'>('movie');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'movie' | 'series' | 'episode'>('all');
   const [movies, setMovies] = useState<Movie[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -47,7 +47,6 @@ export default function HomeScreen() {
   const scrollX = useRef(new Animated.Value(0)).current;
   const bannerRef = useRef<ScrollView>(null);
 
-  // Auto swipe banner setiap 5 detik
   useEffect(() => {
     const interval = setInterval(() => {
       const next = (activeBanner + 1) % banners.length;
@@ -57,7 +56,6 @@ export default function HomeScreen() {
     return () => clearInterval(interval);
   }, [activeBanner]);
 
-  // Auto fetch ketika filter berubah
   useEffect(() => {
     if (search.trim()) {
       fetchMovies();
@@ -65,31 +63,50 @@ export default function HomeScreen() {
   }, [typeFilter]);
 
   const fetchMovies = async () => {
-    if (!search.trim()) {
-      setMovies(null);
-      setError('Anda harus cari film terlebih dahulu.');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
+  if (!search.trim()) {
     setMovies(null);
+    setError('Anda harus cari film terlebih dahulu.');
+    return;
+  }
 
-    try {
+  setLoading(true);
+  setError('');
+  setMovies(null);
+
+  try {
+    let results: Movie[] = [];
+
+    if (typeFilter === 'all') {
+      const types = ['movie', 'series', 'episode'];
+      const requests = types.map((type) =>
+        fetch(`https://www.omdbapi.com/?apikey=b45dad4f&s=${search}&type=${type}`)
+          .then((res) => res.json())
+          .then((data) => (data.Response === 'True' ? data.Search : []))
+      );
+      const responses = await Promise.all(requests);
+      results = responses.flat(); // gabungkan semua hasil
+    } else {
       const response = await fetch(`https://www.omdbapi.com/?apikey=b45dad4f&s=${search}&type=${typeFilter}`);
       const data = await response.json();
-
       if (data.Response === 'True') {
-        setMovies(data.Search);
+        results = data.Search;
       } else {
-        setError(`Maaf film ini tidak ada ${typeFilter}.`);
+        setError(`Maaf film ini tidak ada di kategori ${typeFilter}.`);
       }
-    } catch (e) {
-      setError('Terjadi kesalahan saat mengambil data.');
-    } finally {
-      setLoading(false);
     }
-  };
+
+    if (results.length === 0) {
+      setError(`Maaf film ini tidak ditemukan di kategori ${typeFilter}.`);
+    } else {
+      setMovies(results);
+    }
+  } catch (e) {
+    setError('Terjadi kesalahan saat mengambil data.');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const renderMovie = ({ item }: { item: Movie }) => (
     <TouchableOpacity style={styles.card} onPress={() => router.push(`../detail/${item.imdbID}`)}>
@@ -136,7 +153,7 @@ export default function HomeScreen() {
           <LinearGradient colors={['transparent', '#121212']} style={styles.gradientOverlay} />
         </View>
 
-        {/* Bar Indicator */}
+        {/* Indicator */}
         <View style={styles.bannerIndicator}>
           {banners.map((_, index) => {
             const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
@@ -175,7 +192,7 @@ export default function HomeScreen() {
           })}
         </View>
 
-        {/* Search */}
+        {/* Search Input */}
         <View style={styles.searchContainer}>
           <View style={styles.searchInputContainer}>
             <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
@@ -192,11 +209,11 @@ export default function HomeScreen() {
 
         {/* Filter */}
         <View style={styles.filterContainer}>
-          {['movie', 'series', 'episode'].map((type) => (
+          {['all', 'movie', 'series', 'episode'].map((type) => (
             <TouchableOpacity
               key={type}
               style={[styles.filterButton, typeFilter === type && styles.filterButtonActive]}
-              onPress={() => setTypeFilter(type as 'movie' | 'series' | 'episode')}
+              onPress={() => setTypeFilter(type as 'all' | 'movie' | 'series' | 'episode')}
             >
               <Text style={[styles.filterText, typeFilter === type && styles.filterTextActive]}>
                 {type}
@@ -239,7 +256,6 @@ export default function HomeScreen() {
   );
 }
 
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -277,7 +293,7 @@ const styles = StyleSheet.create({
   barItem: {
     height: 4,
     borderRadius: 2,
-    marginHorizontal: 0.5,
+    marginHorizontal: 1,
   },
   searchContainer: {
     flexDirection: 'row',
