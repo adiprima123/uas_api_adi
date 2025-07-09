@@ -4,7 +4,7 @@
     "slug": "uas-api",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logo.png",
+    "icon": "/assets/logo.png",
     "scheme": "uasapi",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
