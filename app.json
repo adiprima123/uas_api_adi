@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "uas-api",
+    "name": "MovieFinder",
     "slug": "uas-api",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/logo.png",
     "scheme": "uasapi",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.me.marsx.uasapi"
     },
     "web": {
       "bundler": "metro",
