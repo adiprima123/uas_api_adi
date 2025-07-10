@@ -2,12 +2,17 @@ import React, { useEffect } from 'react';
 import { View, Text, Image, StyleSheet, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 
-export default function SplashScreen() {
+export default function SplashScreenPage() {
   useEffect(() => {
+    // Menyembunyikan splash bawaan Expo
+    SplashScreen.hideAsync();
+
     const timer = setTimeout(() => {
       router.push('../(tabs)');
     }, 2500);
+
     return () => clearTimeout(timer);
   }, []);
 
