@@ -7,22 +7,10 @@
     "icon": "./assets/logo.png",
     "scheme": "uasapi",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/logo.png",
-        "backgroundColor": "#0f0f0f"
-      },
-      "edgeToEdgeEnabled": true,
-      "package": "com.me.marsx.uasapi"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+    "splash": {
+      "image": "./assets/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f0f0f"
     },
     "plugins": [
       [
@@ -36,14 +24,30 @@
       ],
       "expo-router"
     ],
-    "experiments": {
-      "typedRoutes": true
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#0f0f0f"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.me.marsx.uasapi"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
     },
     "extra": {
       "router": {},
       "eas": {
         "projectId": "30541bf6-e629-4eca-9502-3f29518f0437"
       }
+    },
+    "experiments": {
+      "typedRoutes": true
     }
   }
 }

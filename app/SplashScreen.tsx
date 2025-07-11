@@ -1,16 +1,15 @@
-import React, { useEffect } from 'react';
-import { View, Text, Image, StyleSheet, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import React, { useEffect } from 'react';
+import { Image, StatusBar, StyleSheet, Text, View } from 'react-native';
 
 export default function SplashScreenPage() {
   useEffect(() => {
-    // Menyembunyikan splash bawaan Expo
-    SplashScreen.hideAsync();
-
-    const timer = setTimeout(() => {
-      router.push('../(tabs)');
+    // TUNGGU 2.5 DETIK LALU SEMBUNYIKAN SPLASH EXPO
+    const timer = setTimeout(async () => {
+      await SplashScreen.hideAsync(); // Sembunyikan splash bawaan Expo
+      router.replace('/(tabs)'); // Navigasi ke Home
     }, 2500);
 
     return () => clearTimeout(timer);

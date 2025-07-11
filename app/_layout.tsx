@@ -19,7 +19,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
+      <Stack initialRouteName="SplashScreen">
         <Stack.Screen name="SplashScreen" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)/index" options={{ headerShown: false }} />
         <Stack.Screen name="detail/[imdbID]" options={{ headerShown: false }} />
